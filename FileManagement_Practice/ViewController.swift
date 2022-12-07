@@ -26,6 +26,7 @@ class ViewController: UIViewController {
      @IBAction private func didTapOnSaveToFmButton(_ sender: UIButton) {
         
         fm.saveToFileManager(image: UIImage(named: imageName), name: imageName)
+        fm.savePdfIntoFileManager(urlString: "file:///Users/pcs213/Downloads/kemh1dd/kemh1a1.pdf")
     }
     
     @IBAction func didTapOnSetImageButton(_ sender: UIButton) {
@@ -45,7 +46,6 @@ class ViewController: UIViewController {
         assistanceImage.image = UIImage(data: data!)
         print(path)
     }
-    
 }
 
 
@@ -112,6 +112,7 @@ class LocalFileManager {
         } catch let error {
             print("Error \(error)")
         }
+        saveTextFile()
     }
     
     
@@ -139,6 +140,48 @@ class LocalFileManager {
         }
         catch let error {
             print("Error \(error)")
+        }
+    }
+
+//MARK: -> Function to save TextFile
+    func saveTextFile() {
+        let file = "sum.text"
+        let text = "2 + 2"
+        guard let url = manager.urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent(folderName) else {
+            print("Error in getting file path")
+            return
+        }
+        let path = url.appendingPathComponent(file)
+        
+        do {
+            try text.write(to: path, atomically: false, encoding: .utf8)
+        }
+        catch let error {
+            print("Error in saving textFile \(error)")
+        }
+    }
+    
+    
+//MARK: -> Function to save pdf file
+    func savePdfIntoFileManager(urlString: String) {
+        DispatchQueue.main.async {
+            let url = URL(string: urlString)
+            let pdfData = try? Data.init(contentsOf: url!)
+            
+            guard let path = self.manager.urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent(self.folderName) else {
+                print("Error in getting PDF path")
+                return
+            }
+            
+            let actualPath = path.appendingPathComponent("Maths.pdf")
+            
+            do {
+                try pdfData?.write(to: actualPath, options: .atomic)
+                print("PDF Added successfully")
+            }
+            catch let error {
+                print("Error \(error)")
+            }
         }
     }
 }
